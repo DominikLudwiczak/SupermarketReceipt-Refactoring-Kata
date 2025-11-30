@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SupermarketTest {
 
@@ -41,5 +42,77 @@ class SupermarketTest {
 
     }
 
+    @Test
+    void singleProductPurchase() {
+        SupermarketCatalog catalog = new FakeCatalog();
+        Product rice = new Product("Rice", ProductUnit.EACH);
+        catalog.addProduct(rice, 2.49);
 
+        Teller teller = new Teller(catalog);
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItemQuantity(rice, 1);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        assertEquals(2.49, receipt.getTotalPrice(), 0.001);
+        assertTrue(receipt.getDiscounts().isEmpty());
+    }
+
+    @Test
+    void buyTwoGetOneFree() {
+        SupermarketCatalog catalog = new FakeCatalog();
+
+        Product toothbrush = new Product("Toothbrush", ProductUnit.EACH);
+        catalog.addProduct(toothbrush, 0.99);
+
+        Teller teller = new Teller(catalog);
+        teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, toothbrush, 0);
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItemQuantity(toothbrush, 3);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        // Only pay for 2: 2 × 0.99 = 1.98
+        assertEquals(1.98, receipt.getTotalPrice(), 0.001);
+    }
+
+    @Test
+    void fiveForSpecialPrice() {
+        SupermarketCatalog catalog = new FakeCatalog();
+
+        Product toothpaste = new Product("Toothpaste", ProductUnit.EACH);
+        catalog.addProduct(toothpaste, 1.79);
+
+        Teller teller = new Teller(catalog);
+        teller.addSpecialOffer(SpecialOfferType.FIVE_FOR_AMOUNT, toothpaste, 7.49);
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItemQuantity(toothpaste, 5);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        assertEquals(7.49, receipt.getTotalPrice(), 0.001);
+    }
+
+    @Test
+    void applesWeightBasedDiscount() {
+        SupermarketCatalog catalog = new FakeCatalog();
+
+        Product apples = new Product("Apples", ProductUnit.KILO);
+        catalog.addProduct(apples, 1.99);
+
+        Teller teller = new Teller(catalog);
+        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, apples, 10.0);
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItemQuantity(apples, 2.0); // buying 2kg
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        double expectedWithoutDiscount = 2.0 * 1.99;
+        double expectedWithDiscount = expectedWithoutDiscount * 0.9;
+
+        assertEquals(expectedWithDiscount, receipt.getTotalPrice(), 0.001);
+    }
 }
