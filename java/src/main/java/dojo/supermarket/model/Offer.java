@@ -12,7 +12,11 @@ public class Offer {
         this.product = product;
     }
 
-    Product getProduct() {
+    public Product getProduct() {
         return product;
     }
+
+    public SpecialOfferType getOfferType() { return offerType; }
+
+    public double getArgument() { return argument; }
 }

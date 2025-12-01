@@ -1,7 +1,5 @@
 package dojo.supermarket.model;
 
-import dojo.supermarket.ReceiptPrinter;
-import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -25,7 +23,7 @@ class SupermarketTest {
         teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, toothbrush, 10.0);
 
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(apples, 2.5);
+        cart.addItem(apples, 2.5);
         
         // ACT
         Receipt receipt = teller.checksOutArticlesFrom(cart);
@@ -50,7 +48,7 @@ class SupermarketTest {
 
         Teller teller = new Teller(catalog);
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(rice, 1);
+        cart.addItem(rice, 1);
 
         Receipt receipt = teller.checksOutArticlesFrom(cart);
 
@@ -69,7 +67,7 @@ class SupermarketTest {
         teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, toothbrush, 0);
 
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(toothbrush, 3);
+        cart.addItem(toothbrush, 3);
 
         Receipt receipt = teller.checksOutArticlesFrom(cart);
 
@@ -88,7 +86,7 @@ class SupermarketTest {
         teller.addSpecialOffer(SpecialOfferType.FIVE_FOR_AMOUNT, toothpaste, 7.49);
 
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(toothpaste, 5);
+        cart.addItem(toothpaste, 5);
 
         Receipt receipt = teller.checksOutArticlesFrom(cart);
 
@@ -106,7 +104,7 @@ class SupermarketTest {
         teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, apples, 10.0);
 
         ShoppingCart cart = new ShoppingCart();
-        cart.addItemQuantity(apples, 2.0); // buying 2kg
+        cart.addItem(apples, 2.0); // buying 2kg
 
         Receipt receipt = teller.checksOutArticlesFrom(cart);
 
@@ -114,5 +112,24 @@ class SupermarketTest {
         double expectedWithDiscount = expectedWithoutDiscount * 0.9;
 
         assertEquals(expectedWithDiscount, receipt.getTotalPrice(), 0.001);
+    }
+
+    @Test
+    void discountAppearsOnReceipt() {
+        SupermarketCatalog catalog = new FakeCatalog();
+
+        Product rice = new Product("Rice", ProductUnit.EACH);
+        catalog.addProduct(rice, 2.49);
+
+        Teller teller = new Teller(catalog);
+        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, rice, 10.0);
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItem(rice, 1);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        assertEquals(1, receipt.getDiscounts().size());
+        assertTrue(receipt.getDiscounts().get(0).getDescription().contains("% off"));
     }
 }
