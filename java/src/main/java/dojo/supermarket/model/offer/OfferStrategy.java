@@ -5,9 +5,9 @@ import dojo.supermarket.model.*;
 import java.util.Map;
 
 public interface OfferStrategy {
-
-    void apply(Offer offers,
-               Map<Product, Double> productQuantities,
-               SupermarketCatalog catalog,
+    void apply(Product product,
+               double quantity,
+               double unitPrice,
+               double argument,
                Receipt receipt);
 }

@@ -1,5 +1,8 @@
 package dojo.supermarket.model;
 
+import dojo.supermarket.model.offer.PercentageOfferStrategy;
+import dojo.supermarket.model.offer.XForAmountOfferStrategy;
+import dojo.supermarket.model.offer.XForYOfferStrategy;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -20,7 +23,7 @@ class SupermarketTest {
         catalog.addProduct(apples, 1.99);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, toothbrush, 10.0);
+        teller.addSpecialOffer(new PercentageOfferStrategy(), toothbrush, 10.0);
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(apples, 2.5);
@@ -64,7 +67,7 @@ class SupermarketTest {
         catalog.addProduct(toothbrush, 0.99);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.THREE_FOR_TWO, toothbrush, 0);
+        teller.addSpecialOffer(new XForYOfferStrategy(3), toothbrush, 2);
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(toothbrush, 3);
@@ -83,7 +86,7 @@ class SupermarketTest {
         catalog.addProduct(toothpaste, 1.79);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.FIVE_FOR_AMOUNT, toothpaste, 7.49);
+        teller.addSpecialOffer(new XForAmountOfferStrategy(5), toothpaste, 7.49);
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(toothpaste, 5);
@@ -101,7 +104,7 @@ class SupermarketTest {
         catalog.addProduct(apples, 1.99);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, apples, 10.0);
+        teller.addSpecialOffer(new PercentageOfferStrategy(), apples, 10.0);
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(apples, 2.0); // buying 2kg
@@ -122,7 +125,7 @@ class SupermarketTest {
         catalog.addProduct(rice, 2.49);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.TEN_PERCENT_DISCOUNT, rice, 10.0);
+        teller.addSpecialOffer(new PercentageOfferStrategy(), rice, 10.0);
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(rice, 1);
