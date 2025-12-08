@@ -2,9 +2,17 @@ package dojo.supermarket.model.offer;
 
 import dojo.supermarket.model.*;
 
-import java.util.Map;
+import java.util.Date;
 
-public class PercentageOfferStrategy implements OfferStrategy {
+public class PercentageOfferStrategy extends OfferStrategy {
+
+    public PercentageOfferStrategy(Date startDate, Date endDate) {
+        super(startDate, endDate);
+    }
+
+    public PercentageOfferStrategy() {
+        super(null, null);
+    }
 
     @Override
     public void apply(Product product,

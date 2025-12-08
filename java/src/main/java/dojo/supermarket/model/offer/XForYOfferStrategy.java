@@ -4,15 +4,24 @@ import dojo.supermarket.model.Discount;
 import dojo.supermarket.model.Product;
 import dojo.supermarket.model.Receipt;
 
-public class XForYOfferStrategy implements OfferStrategy {
+import java.util.Date;
+
+public class XForYOfferStrategy extends OfferStrategy {
     private final int requiredQuantity;
 
+    public XForYOfferStrategy(Date startDate, Date endDate, int requiredQuantity) {
+        super(startDate, endDate);
+        this.requiredQuantity = requiredQuantity;
+    }
+
     public XForYOfferStrategy(int requiredQuantity) {
+        super(null, null);
         this.requiredQuantity = requiredQuantity;
     }
 
     @Override
     public void apply(Product product, double quantity, double unitPrice, double argument, Receipt receipt) {
+
         if (quantity >= requiredQuantity) {
             int numberOfOffers = (int) (quantity / requiredQuantity);
             double totalOfferPrice = numberOfOffers * argument * unitPrice;

@@ -3,10 +3,18 @@ package dojo.supermarket.model.offer;
 import dojo.supermarket.model.Product;
 import dojo.supermarket.model.Receipt;
 
-public class XForAmountOfferStrategy implements OfferStrategy {
+import java.util.Date;
+
+public class XForAmountOfferStrategy extends OfferStrategy {
     private final int requiredQuantity;
 
+    public XForAmountOfferStrategy(Date startDate, Date endDate, int requiredQuantity) {
+        super(startDate, endDate);
+        this.requiredQuantity = requiredQuantity;
+    }
+
     public XForAmountOfferStrategy(int requiredQuantity) {
+        super(null, null);
         this.requiredQuantity = requiredQuantity;
     }
 

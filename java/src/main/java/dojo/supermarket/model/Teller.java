@@ -3,6 +3,7 @@ package dojo.supermarket.model;
 import dojo.supermarket.model.offer.OfferStrategy;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
