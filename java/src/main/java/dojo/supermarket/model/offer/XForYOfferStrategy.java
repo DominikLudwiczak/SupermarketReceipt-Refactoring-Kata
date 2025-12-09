@@ -1,35 +1,39 @@
 package dojo.supermarket.model.offer;
 
-import dojo.supermarket.model.Discount;
-import dojo.supermarket.model.Product;
-import dojo.supermarket.model.Receipt;
+import dojo.supermarket.model.discount.Discount;
+import dojo.supermarket.model.discount.OneProductDiscount;
+import dojo.supermarket.model.product.Product;
+import dojo.supermarket.model.receipt.Receipt;
 
 import java.util.Date;
 
-public class XForYOfferStrategy extends OfferStrategy {
+public class XForYOfferStrategy extends OneProductOffer {
     private final int requiredQuantity;
 
-    public XForYOfferStrategy(Date startDate, Date endDate, int requiredQuantity) {
-        super(startDate, endDate);
+    public XForYOfferStrategy(Date startDate, Date endDate, double argument, Product product,  int requiredQuantity) {
+        super(startDate, endDate, argument, product);
         this.requiredQuantity = requiredQuantity;
     }
 
-    public XForYOfferStrategy(int requiredQuantity) {
-        super(null, null);
+    public XForYOfferStrategy(double argument, Product product, int requiredQuantity) {
+        super(argument, product);
         this.requiredQuantity = requiredQuantity;
     }
 
     @Override
-    public void apply(Product product, double quantity, double unitPrice, double argument, Receipt receipt) {
-
-        if (quantity >= requiredQuantity) {
-            int numberOfOffers = (int) (quantity / requiredQuantity);
-            double totalOfferPrice = numberOfOffers * argument * unitPrice;
-            double normalPrice = numberOfOffers * requiredQuantity * unitPrice;
+    public void apply(Receipt receipt) {
+        var receiptItem = receipt.getItems().getOrDefault(product, null);
+        if (receiptItem == null) {
+            return;
+        }
+        if (receiptItem.getQuantity() >= requiredQuantity) {
+            int numberOfOffers = (int) (receiptItem.getQuantity() / requiredQuantity);
+            double totalOfferPrice = numberOfOffers * argument * receiptItem.getPrice();
+            double normalPrice = numberOfOffers * requiredQuantity * receiptItem.getPrice();
             double discountAmount = normalPrice - totalOfferPrice;
 
             if (discountAmount > 0) {
-                receipt.addDiscount(new Discount(product, numberOfOffers + " * " + requiredQuantity + " for " + argument, discountAmount));
+                receipt.addDiscount(new OneProductDiscount(product, numberOfOffers + " * " + requiredQuantity + " for " + argument, discountAmount));
             }
         }
     }

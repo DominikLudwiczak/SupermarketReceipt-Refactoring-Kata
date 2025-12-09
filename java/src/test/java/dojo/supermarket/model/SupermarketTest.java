@@ -3,6 +3,10 @@ package dojo.supermarket.model;
 import dojo.supermarket.model.offer.PercentageOfferStrategy;
 import dojo.supermarket.model.offer.XForAmountOfferStrategy;
 import dojo.supermarket.model.offer.XForYOfferStrategy;
+import dojo.supermarket.model.product.Product;
+import dojo.supermarket.model.product.ProductUnit;
+import dojo.supermarket.model.receipt.Receipt;
+import dojo.supermarket.model.receipt.ReceiptItem;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -23,7 +27,7 @@ class SupermarketTest {
         catalog.addProduct(apples, 1.99);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(new PercentageOfferStrategy(), toothbrush, 10.0);
+        teller.addSpecialOffer(new PercentageOfferStrategy(10.0, toothbrush));
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(apples, 2.5);
@@ -35,10 +39,9 @@ class SupermarketTest {
         assertEquals(4.975, receipt.getTotalPrice(), 0.01);
         assertEquals(Collections.emptyList(), receipt.getDiscounts());
         assertEquals(1, receipt.getItems().size());
-        ReceiptItem receiptItem = receipt.getItems().get(0);
+        ReceiptItem receiptItem = receipt.getItems().get(apples);
         assertEquals(apples, receiptItem.getProduct());
         assertEquals(1.99, receiptItem.getPrice());
-        assertEquals(2.5*1.99, receiptItem.getTotalPrice());
         assertEquals(2.5, receiptItem.getQuantity());
 
     }
@@ -67,7 +70,7 @@ class SupermarketTest {
         catalog.addProduct(toothbrush, 0.99);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(new XForYOfferStrategy(3), toothbrush, 2);
+        teller.addSpecialOffer(new XForYOfferStrategy(2, toothbrush, 3));
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(toothbrush, 3);
@@ -86,7 +89,7 @@ class SupermarketTest {
         catalog.addProduct(toothpaste, 1.79);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(new XForAmountOfferStrategy(5), toothpaste, 7.49);
+        teller.addSpecialOffer(new XForAmountOfferStrategy(7.49, toothpaste, 5));
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(toothpaste, 5);
@@ -104,7 +107,7 @@ class SupermarketTest {
         catalog.addProduct(apples, 1.99);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(new PercentageOfferStrategy(), apples, 10.0);
+        teller.addSpecialOffer(new PercentageOfferStrategy(10.0, apples));
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(apples, 2.0); // buying 2kg
@@ -125,7 +128,7 @@ class SupermarketTest {
         catalog.addProduct(rice, 2.49);
 
         Teller teller = new Teller(catalog);
-        teller.addSpecialOffer(new PercentageOfferStrategy(), rice, 10.0);
+        teller.addSpecialOffer(new PercentageOfferStrategy(10.0, rice));
 
         ShoppingCart cart = new ShoppingCart();
         cart.addItem(rice, 1);

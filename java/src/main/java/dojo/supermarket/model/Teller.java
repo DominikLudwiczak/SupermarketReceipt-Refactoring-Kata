@@ -1,9 +1,10 @@
 package dojo.supermarket.model;
 
-import dojo.supermarket.model.offer.OfferStrategy;
+import dojo.supermarket.model.offer.Offer;
+import dojo.supermarket.model.product.Product;
+import dojo.supermarket.model.receipt.Receipt;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,25 +17,22 @@ public class Teller {
         this.catalog = catalog;
     }
 
-    public void addSpecialOffer(OfferStrategy offerStraegy, Product product, double argument) {
-        offers.add(new Offer(offerStraegy, product, argument));
+    public void addSpecialOffer(Offer offer) {
+        offers.add(offer);
     }
 
     public Receipt checksOutArticlesFrom(ShoppingCart theCart) {
         Receipt receipt = new Receipt();
-        Map<Product, Double> productQuantities = theCart.productQuantities();
-        for (Map.Entry<Product, Double> pq: productQuantities.entrySet()) {
+        for (Map.Entry<Product, Double> pq: theCart.productQuantities().entrySet()) {
             Product p = pq.getKey();
             double quantity = pq.getValue();
             double unitPrice = catalog.getUnitPrice(p);
-            double price = quantity * unitPrice;
-            receipt.addProduct(p, quantity, unitPrice, price);
+            receipt.addProduct(p, quantity, unitPrice);
         }
 
         for (Offer offer : offers) {
-            Product product = offer.getProduct();
-            if(productQuantities.containsKey(product)) {
-                offer.apply(productQuantities.get(product), catalog.getUnitPrice(product), receipt);
+            if(offer.isValid()) {
+                offer.apply(receipt);
             }
         }
 

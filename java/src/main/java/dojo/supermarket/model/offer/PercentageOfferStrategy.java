@@ -1,29 +1,29 @@
 package dojo.supermarket.model.offer;
 
-import dojo.supermarket.model.*;
+import dojo.supermarket.model.discount.Discount;
+import dojo.supermarket.model.discount.OneProductDiscount;
+import dojo.supermarket.model.product.Product;
+import dojo.supermarket.model.receipt.Receipt;
 
 import java.util.Date;
 
-public class PercentageOfferStrategy extends OfferStrategy {
-
-    public PercentageOfferStrategy(Date startDate, Date endDate) {
-        super(startDate, endDate);
+public class PercentageOfferStrategy extends OneProductOffer {
+    public PercentageOfferStrategy(Date startDate, Date endDate, double argument, Product product) {
+        super(startDate, endDate, argument, product);
     }
 
-    public PercentageOfferStrategy() {
-        super(null, null);
+    public PercentageOfferStrategy(double argument, Product product) {
+        super(argument, product);
     }
 
-    @Override
-    public void apply(Product product,
-                      double quantity,
-                      double unitPrice,
-                      double argument,
-                      Receipt receipt) {
-
-        double discount = unitPrice * quantity * (argument / 100);
+    public void apply(Receipt receipt) {
+        var receiptItem = receipt.getItems().getOrDefault(product, null);
+        if (receiptItem == null) {
+            return;
+        }
+        double discount = receiptItem.getPrice() * receiptItem.getQuantity() * (argument / 100);
         if (discount > 0.0) {
-            receipt.addDiscount(new Discount(product, argument + "% off", discount));
+            receipt.addDiscount(new OneProductDiscount(product, argument + "% off", discount));
         }
     }
 }

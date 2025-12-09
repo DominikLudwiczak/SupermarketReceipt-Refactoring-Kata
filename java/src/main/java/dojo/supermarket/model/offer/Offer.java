@@ -1,16 +1,24 @@
 package dojo.supermarket.model.offer;
 
-import dojo.supermarket.model.*;
+import dojo.supermarket.model.receipt.Receipt;
 
 import java.util.Date;
 
-public class OfferStrategy {
+public abstract class Offer {
+    double argument;
     Date startDate;
     Date endDate;
 
-    public OfferStrategy(Date startDate, Date endDate) {
+    public Offer(Date startDate, Date endDate, double argument) {
         this.startDate = startDate;
         this.endDate = endDate;
+        this.argument = argument;
+    }
+
+    public Offer(double argument) {
+        this.startDate = null;
+        this.endDate = null;
+        this.argument = argument;
     }
 
     public boolean isValid() {
@@ -23,11 +31,5 @@ public class OfferStrategy {
         return !(currentDate.before(startDate) || currentDate.after(endDate));
     }
 
-    public void apply(Product product,
-               double quantity,
-               double unitPrice,
-               double argument,
-               Receipt receipt) {
-
-    }
+    public void apply(Receipt receipt){};
 }
