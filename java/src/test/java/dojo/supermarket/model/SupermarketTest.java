@@ -1,8 +1,6 @@
 package dojo.supermarket.model;
 
-import dojo.supermarket.model.offer.PercentageOfferStrategy;
-import dojo.supermarket.model.offer.XForAmountOfferStrategy;
-import dojo.supermarket.model.offer.XForYOfferStrategy;
+import dojo.supermarket.model.offer.*;
 import dojo.supermarket.model.product.Product;
 import dojo.supermarket.model.product.ProductUnit;
 import dojo.supermarket.model.receipt.Receipt;
@@ -10,6 +8,8 @@ import dojo.supermarket.model.receipt.ReceiptItem;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,7 +77,6 @@ class SupermarketTest {
 
         Receipt receipt = teller.checksOutArticlesFrom(cart);
 
-        // Only pay for 2: 2 × 0.99 = 1.98
         assertEquals(1.98, receipt.getTotalPrice(), 0.001);
     }
 
@@ -137,5 +136,67 @@ class SupermarketTest {
 
         assertEquals(1, receipt.getDiscounts().size());
         assertTrue(receipt.getDiscounts().get(0).getDescription().contains("% off"));
+    }
+
+    @Test
+    void bundleDiscountAppliedForCompleteBundle() {
+        SupermarketCatalog catalog = new FakeCatalog();
+        Product toothbrush = new Product("toothbrush", ProductUnit.EACH);
+        Product toothpaste = new Product("toothpaste", ProductUnit.EACH);
+
+        catalog.addProduct(toothbrush, 0.99);
+        catalog.addProduct(toothpaste, 1.79);
+
+        Teller teller = new Teller(catalog);
+        teller.addSpecialOffer(new BundlePercentageOfferStrategy(10.0,
+            new HashMap<>() {{
+                put(toothbrush, 1.0);
+                put(toothpaste, 1.0);
+            }}
+        ));
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItem(toothbrush, 1);
+        cart.addItem(toothpaste, 2);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        assertEquals(4.29, receipt.getTotalPrice(), 0.01);
+    }
+
+
+    @Test
+    void testLoyaltyPoints() {
+        SupermarketCatalog catalog = new FakeCatalog();
+        Product cereal = new Product("Cereal", ProductUnit.EACH);
+        catalog.addProduct(cereal, 3.00);
+
+        Teller teller = new Teller(catalog);
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItem(cereal, 7);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        assertEquals(7, receipt.getLoyaltyPoints());
+    }
+
+    @Test
+    void testOfferValidityPeriod() {
+        SupermarketCatalog catalog = new FakeCatalog();
+        Product milk = new Product("Milk", ProductUnit.EACH);
+        catalog.addProduct(milk, 1.50);
+
+        Teller teller = new Teller(catalog);
+        var startDate = new Date(2023, 1, 1);
+        var endDate = new Date(2023, 12, 31);
+        teller.addSpecialOffer(new PercentageOfferStrategy(startDate, endDate, 20.0, milk));
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.addItem(milk, 2);
+
+        Receipt receipt = teller.checksOutArticlesFrom(cart);
+
+        assertEquals(3.00, receipt.getTotalPrice(), 0.001);
+        assertTrue(receipt.getDiscounts().isEmpty());
     }
 }

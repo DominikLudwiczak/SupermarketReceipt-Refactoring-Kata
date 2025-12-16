@@ -21,6 +21,10 @@ public class Receipt {
         return total;
     }
 
+    public int getLoyaltyPoints() {
+        return (int) getTotalPrice() / 3;
+    }
+
     public void addProduct(Product p, double quantity, double price) {
         if(items.containsKey(p)) {
             ReceiptItem existingItem = items.get(p);
